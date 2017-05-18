@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 
@@ -12,31 +13,20 @@ import (
 
 func main() {
 	keyID := os.Getenv("SDC_KEY_ID")
+	endpoint := os.Getenv("SDC_URL")
 	accountName := os.Getenv("SDC_ACCOUNT")
 
-	file, err := os.Open(os.Getenv("SDC_KEY_FILE"))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	privateKey := make([]byte, 5000)
-	_, err = file.Read(privateKey)
+	privateKey, err := ioutil.ReadFile(os.Getenv("SDC_KEY_FILE"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	sshKeySigner, err := authentication.NewPrivateKeySigner(keyID, privateKey, accountName)
 	if err != nil {
-		log.Fatalf("Fatal exception from NewPrivateKeySigner: %s", err)
+		log.Fatal(err)
 	}
 
-	// sshKeySigner, err := authentication.NewSSHAgentSigner(os.Getenv("SDC_KEY_ID"), os.Getenv("SDC_ACCOUNT"))
-	// if err != nil {
-	// 	log.Fatalf("NewSSHAgentSigner: %s", err)
-	// }
-
-	client, err := triton.NewClient(os.Getenv("SDC_URL"), os.Getenv("SDC_ACCOUNT"), sshKeySigner)
-	// client, err := triton.NewClient(os.Getenv("SDC_URL"), os.Getenv("SDC_ACCOUNT"), sshKeySigner)
+	client, err := triton.NewClient(endpoint, accountName, sshKeySigner)
 	if err != nil {
 		log.Fatalf("NewClient: %s", err)
 	}
