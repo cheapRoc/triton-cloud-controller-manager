@@ -59,5 +59,44 @@ The following controllers will be implemented by the `triton-cloud-controller-ma
 $ make help
 ```
 
+# Running
+
+**NOTE**: In order to test this daemon you'll probably want a Kubernetes cluster
+  of your own. I followed Joyent's [Kubernetes The Hard Way][hard-way] blog
+  article but I'm sure you can use whatever you've got running. Please let me
+  know what doesn't work.
+
+[hard-way]: https://www.joyent.com/blog/kubernetes-the-hard-way
+
+First, create a separate SSH key (using `ssh-keygen`) and apply it to your
+Triton account. This will be used to authenticate all `triton-go` requests
+coming out of this controller.
+
+Next, disable any existing cloud provider control loops running within
+`kube-controller-manager` by setting the `--cloud-provider` flag to `external`
+when starting the `kube-controller-manager` itself. If you used
+[the hard way][hard-way] then you'll need to edit
+`/etc/systemd/system/kube-controller-manager.service` to include the service
+with the flag mentioned above.
+
+You'll need to build the binary specifically for the platform you've deployed
+Kubernetes onto. My default is `linux-64`.
+
+```sh
+$ make build
+```
+
+Once the binary is built, copy it to your deploy host and run the
+following... or do we run it from `systemd`???
+
+```sh
+$ kubectl ...something or other....
+```
+
+More notes here...
+
+- https://kubernetes.io/docs/tasks/administer-cluster/running-cloud-controller/
+- https://github.com/coreos/coreos-kubernetes/blob/adcbe533/multi-node/aws/artifacts/manifests/controller/kube-controller-manager.yaml#L16
+
 [kube]: https://kubernetes.io
 [secret]: https://github.com/kubernetes/contrib/blob/master/ingress/controllers/gce/examples/https/make_secret.go
