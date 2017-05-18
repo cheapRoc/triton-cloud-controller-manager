@@ -80,7 +80,7 @@ when starting the `kube-controller-manager` itself. If you used
 with the flag mentioned above.
 
 You'll need to build the binary specifically for the platform you've deployed
-Kubernetes onto. My default is `linux-64`.
+Kubernetes onto. My default is (will be) `linux/amd64`.
 
 ```sh
 $ make build
