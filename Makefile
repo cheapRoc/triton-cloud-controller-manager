@@ -9,7 +9,7 @@ help:
 
 ## Build the controller binary for the local OS only
 build: build/binary
-build/binary:  deps triton/*.go main.go
+build/binary: */*.go *.go
 		go build -o build/triton-cloud-controller-manager -ldflags "$(LDFLAGS)"
 
 ## Install dev/test CLI tooling
