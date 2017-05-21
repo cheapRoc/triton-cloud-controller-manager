@@ -1,0 +1,28 @@
+package: github.com/cheapRoc/triton-cloud-controller-manager
+import:
+- package: github.com/golang/glog
+- package: github.com/joyent/triton-go
+  subpackages:
+  - authentication
+- package: github.com/spf13/pflag
+- package: k8s.io/apimachinery
+  subpackages:
+  - pkg/types
+- package: k8s.io/apiserver
+  subpackages:
+  - pkg/server/healthz
+  - pkg/util/flag
+  - pkg/util/logs
+- package: k8s.io/client-go
+  subpackages:
+  - tools/cache
+- package: k8s.io/kubernetes
+  version: ^1.7.0-alpha.4
+  subpackages:
+  - cmd/cloud-controller-manager/app
+  - cmd/cloud-controller-manager/app/options
+  - pkg/api/v1
+  - pkg/client/metrics/prometheus
+  - pkg/cloudprovider
+  - pkg/version/prometheus
+  - pkg/version/verflag
