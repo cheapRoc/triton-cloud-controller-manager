@@ -5,36 +5,41 @@ LDFLAGS := -X ${IMPORT_PATH}/core.GitHash='$(shell git rev-parse --short HEAD)' 
 
 ## Display this help message
 help:
-		@awk '/^##.*$$/,/[a-zA-Z_-]+:/' $(MAKEFILE_LIST) | awk '!(NR%2){print $$0p}{p=$$0}' | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' | sort
+	@awk '/^##.*$$/,/[a-zA-Z_-]+:/' $(MAKEFILE_LIST) | awk '!(NR%2){print $$0p}{p=$$0}' | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' | sort
 
 ## Build the controller binary for the local OS only
-build: build/binary
-build/binary: */*.go *.go
-		go build -o build/triton-cloud-controller-manager -ldflags "$(LDFLAGS)"
+build: build/bin
+build/bin: */*.go *.go
+	go build -o build/triton-cloud-controller-manager -ldflags "$(LDFLAGS)"
+build/fresh: clean deps build
+build/docker:
+	@echo "--> Building Docker container"
+	@docker build -t triton_build .
+	@echo "--> Running Docker build container"
+	@docker run --rm -v $(pwd):/go/src/github.com/cheapRoc/triton-cloud-controller-manager triton_build make build/bin
 
 ## Install dev/test CLI tooling
 tools:
-		@go version | grep 1.7 || (echo 'go1.7 not installed'; exit 1)
-		@echo Installing tools and dependencies
-		go get -u github.com/golang/dep/cmd/dep
-		go get -u github.com/golang/lint/golint
+	@go version | grep 1.7 || (echo 'go1.7 not installed'; exit 1)
+	@echo "--> Installing tools and dependencies"
+	go get -u github.com/golang/lint/golint
 
 ## Cleanly install all dependencies
 deps: tools
-		dep ensure
+	dep ensure
 
 ## Update all dependencies if possible
 deps-update: clean tools
-		deps ensure -update
+	deps ensure -update
 
 ## Clean out all dependencies from vendor/
 clean:
-		rm -rf vendor
+	rm -rf vendor
 
 ## Execute golint against the project
 lint:
-		@golint
+	@golint
 
 ## Execute all unit tests
 test: tools
-		@go test -v
+	@go test -v
